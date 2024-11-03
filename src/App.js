@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import Home from './components/Home';
+import RecipeList from './components/RecipeList';
+import axios from 'axios';
 
-function App() {
+const App = () => {
+  const [recipes, setRecipes] = useState([]);
+
+  const fetchRecipes = async (query) => {
+    try {
+      const response = await axios.get(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
+      setRecipes(response.data.meals || []);
+    } catch (error) {
+      console.error( error);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home onSearch={fetchRecipes} />} />
+        <Route path="/results" element={<RecipeList recipes={recipes} />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
